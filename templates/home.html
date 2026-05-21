@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core Scrapping Project</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(12, 21, 37, 0.82);
+      --panel-2: rgba(20, 31, 53, 0.85);
+      --text: #eef4ff;
+      --muted: #a7b5cc;
+      --accent: #43c6ac;
+      --accent-2: #3a7bd5;
+      --line: rgba(255, 255, 255, 0.12);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(67, 198, 172, 0.18), transparent 30%),
+        radial-gradient(circle at right center, rgba(58, 123, 213, 0.22), transparent 28%),
+        linear-gradient(135deg, #04101d 0%, #07192e 52%, #03080f 100%);
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
+      opacity: 0.15;
+    }
+
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      width: min(1120px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(12, 21, 37, 0.94), rgba(8, 16, 28, 0.88));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 0;
+    }
+
+    .copy {
+      padding: clamp(28px, 6vw, 72px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 22px;
+    }
+
+    .eyebrow span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(67, 198, 172, 0.7);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 11ch;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      max-width: 58ch;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      border: 1px solid transparent;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      color: #04101d;
+      background: linear-gradient(135deg, #7fffd4, #74b9ff);
+      box-shadow: 0 16px 32px rgba(58, 123, 213, 0.26);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .right {
+      padding: clamp(28px, 5vw, 58px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-left: 1px solid var(--line);
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .panel {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .api-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .api-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .api-item strong { color: var(--text); }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 18px 28px 28px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #7fffd4;
+      box-shadow: 0 0 14px rgba(127,255,212,0.7);
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .right { border-left: 0; border-top: 1px solid var(--line); }
+      h1 { max-width: 14ch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <main class="wrap">
+    <section class="card">
+      <div class="hero">
+        <div class="copy">
+          <div class="eyebrow"><span></span> Core Scrapping Project</div>
+          <h1>Welcome to the scraping workspace</h1>
+          <p class="lead">
+            Register with email, verify your account with OTP, log in with JWT, update your profile, reset your password,
+            and scrape websites securely from a single API platform.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="/api/account/register/">Open Auth API</a>
+            <a class="btn btn-secondary" href="/api/scraped/run/">Open Scrape API</a>
+          </div>
+        </div>
+        <aside class="right">
+          <div class="panel">
+            <h2>What you can do</h2>
+            <div class="api-grid">
+              <div class="api-item"><strong>Email auth</strong><span>Register, verify, login</span></div>
+              <div class="api-item"><strong>Password tools</strong><span>Change and reset</span></div>
+              <div class="api-item"><strong>Profile</strong><span>Name, photo, read/update</span></div>
+              <div class="api-item"><strong>Scraping</strong><span>HTTP and HTTPS URLs</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>Quick endpoints</h2>
+            <div class="api-grid">
+              <div class="api-item"><strong>/api/account/register/</strong><span>POST</span></div>
+              <div class="api-item"><strong>/api/account/login/</strong><span>POST</span></div>
+              <div class="api-item"><strong>/api/scraped/run/</strong><span>POST</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      <div class="footer">
+        <div class="tag"><span class="dot"></span> Django + DRF + JWT + PostgreSQL</div>
+        <div>Use the API endpoints directly or test them in Postman.</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
