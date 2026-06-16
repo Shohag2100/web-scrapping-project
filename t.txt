@@ -1,0 +1,40 @@
+Analyze my existing Django video upload and processing implementation.
+
+Important constraints:
+
+* Do NOT change any API endpoints.
+* Do NOT change request or response formats.
+* Do NOT change the upload flow or chunk upload logic.
+* Do NOT introduce breaking changes for the frontend.
+* Preserve all existing business logic unless it is directly causing the video optimization issue.
+
+My goal is only to fix the current video processing problem.
+
+Tasks:
+
+1. Review the current video upload, chunk merge, and processing code.
+2. Identify why large videos are not being optimized properly.
+3. Find issues related to:
+
+   * FFmpeg configuration
+   * Resolution detection
+   * Bitrate settings
+   * Memory usage
+   * Temporary file handling
+   * Processing failures
+   * Large file handling
+   * HLS generation
+4. Improve video optimization while keeping the current API and workflow unchanged.
+5. If the source video is 1080p, preserve high quality and avoid unnecessary quality loss.
+6. If the source video is lower than 1080p, do not upscale it.
+7. Keep existing database models whenever possible.
+8. Make only minimal code changes required to solve the problem.
+9. Add logging and error handling where necessary.
+10. Explain:
+
+    * Root cause of the issue
+    * Files that need modification
+    * Exact code changes required
+    * Why each change fixes the problem
+
+Before making changes, first inspect the existing implementation and provide a detailed diagnosis of the problem.
