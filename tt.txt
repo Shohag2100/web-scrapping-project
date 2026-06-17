@@ -1,0 +1,90 @@
+Analyze my Django video streaming implementation and fix performance and video optimization issues without changing existing API endpoints, URL patterns, request formats, response formats, serializers, or frontend integration.
+
+Current implementation details:
+
+* Videos are uploaded and stored successfully.
+* HLS generation is handled by ensure_hls_generated().
+* Download endpoint redirects to playlist.m3u8.
+* FFmpeg is currently executed from ensure_hls_generated().
+* Video metadata currently stores only duration.
+* Existing business logic and permissions must remain unchanged.
+
+Problems to solve:
+
+1. HLS generation currently happens during video download requests, causing slow response times for large videos.
+2. Large videos are not optimized properly before HLS generation.
+3. FFmpeg commands are missing proper compression settings.
+4. No processing status tracking exists.
+5. Large video handling is inefficient.
+6. HLS generation should support production-scale video streaming.
+
+Requirements:
+
+* Keep all existing APIs unchanged.
+* Keep all existing routes unchanged.
+* Keep serializer outputs unchanged.
+* Keep download endpoint behavior unchanged.
+* Do not redesign the application.
+* Make minimal code changes required.
+
+Implement:
+
+1. Move HLS generation from request lifecycle to Celery background tasks.
+
+2. Add video processing status:
+
+   * pending
+   * processing
+   * completed
+   * failed
+
+3. Improve FFmpeg commands:
+
+   * H.264 video codec
+   * AAC audio codec
+   * CRF-based compression
+   * faststart optimization
+   * optimized HLS segment generation
+
+4. Detect source video resolution using ffprobe.
+
+5. Generate adaptive HLS:
+
+   * 1080p if source >= 1080p
+   * 720p if source >= 720p
+   * 480p for all videos
+   * Never upscale videos
+
+6. Store metadata:
+
+   * width
+   * height
+   * bitrate
+   * file_size
+   * duration
+
+7. Improve temporary file cleanup.
+
+8. Improve logging and error handling.
+
+9. Review the existing ensure_hls_generated() function and identify:
+
+   * bottlenecks
+   * memory issues
+   * FFmpeg issues
+   * scalability problems
+
+10. Fix incorrect HTTP headers and streaming-related issues.
+
+Output:
+
+* Root cause analysis
+* Exact files requiring modification
+* Full code changes
+* Celery task implementation
+* Updated FFmpeg commands
+* Model changes
+* Migration files
+* Production recommendations
+
+Do not create new APIs. Do not modify frontend contracts. Focus only on fixing performance, optimization, and streaming issues in the current implementation.
