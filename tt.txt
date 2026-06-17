@@ -88,3 +88,110 @@ Output:
 * Production recommendations
 
 Do not create new APIs. Do not modify frontend contracts. Focus only on fixing performance, optimization, and streaming issues in the current implementation.
+_________________________________________________
+__________________________________________________
+I need help refactoring my Django + DRF subscription/access control system.
+
+Current subscription plan model:
+
+{
+"id": 1,
+"code": "free",
+"product_id": null,
+"name": "Free",
+"price": "0.00",
+"duration_days": null,
+"is_unlimited_shorts": false,
+"is_unlimited_series_video": false,
+"is_unlimited_ai_chatbot": false,
+"shorts_daily_limit": 3,
+"series_trailers_daily_limit": 3,
+"ai_chatbot_daily_limit": 3,
+"description": "Free plan with daily limits",
+"is_active": true
+}
+
+Business Rules:
+
+* Free users can watch:
+
+  * 3 shorts per day
+  * 3 series trailers per day
+  * 3 AI chatbot requests per day
+* Limits reset daily.
+* Premium users may have unlimited access depending on plan settings.
+* Limits must be enforced from the backend, not the mobile app.
+
+Current Problems:
+
+1. `/api/subscriptions/check-access` reduces the remaining count every time it is called.
+2. Access-checking and usage-consumption logic are mixed together.
+3. Users can uninstall and reinstall the app and continue using free limits because tracking is not properly enforced.
+4. Counts should never be stored only on the device.
+5. Daily usage tracking is unreliable.
+
+Required Solution:
+
+* `check-access` must be READ ONLY.
+* Calling `check-access` should never create, update, or deduct usage records.
+* Usage should only be deducted when the user actually:
+
+  * Starts watching a short
+  * Starts watching a trailer
+  * Sends an AI chatbot message
+* Store all usage in the database.
+* Track daily usage per user and per feature.
+* Daily limits must automatically reset based on date.
+* User uninstalling/reinstalling the app must not reset usage because limits are tied to the user account.
+* Prevent duplicate counting if the same request is retried multiple times.
+* Use database transactions and race-condition protection.
+
+Please review my existing code and provide:
+
+1. Proper database schema for daily usage tracking.
+2. Django models.
+3. DRF serializers.
+4. Service-layer implementation.
+5. API view refactor.
+6. Migration examples.
+7. Access-control logic.
+8. Daily reset logic.
+9. Best practices for Google Play and Apple subscriptions.
+10. Production-ready code.
+
+Suggested implementation:
+
+Create a UserDailyUsage model:
+
+* user
+* date
+* shorts_used
+* trailers_used
+* ai_chatbot_used
+* created_at
+* updated_at
+
+Example:
+
+2026-06-17
+
+shorts_used = 2
+trailers_used = 3
+ai_chatbot_used = 1
+
+check-access response should be:
+
+{
+"allowed": true,
+"feature": "shorts_watch",
+"plan": "free",
+"used": 2,
+"remaining": 1,
+"daily_limit": 3
+}
+
+No counters should change when this API is called.
+
+Only actual content consumption should update usage counters.
+
+Please identify all bugs in the current implementation and refactor it according to clean architecture and DRF best practices.
